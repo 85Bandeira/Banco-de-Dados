@@ -1,0 +1,80 @@
+show databases;
+drop database bdweb34;
+create database BDWeb34;
+--
+show create database BDWeb34;
+-- 
+use BDWeb34;
+
+drop table agendamento;
+
+CREATE TABLE Agendamento (
+Seq_agenda int not null auto_increment primary key,
+Data_hora Date not null,
+CPF char(11),
+Cod_ser int
+);
+
+desc agendamento;
+show create table agendamento;
+
+CREATE TABLE Cliente (
+CPF char(11) not null,
+Logradouro varchar(60),
+Numero int,
+Compl varchar(20),
+Nome varchar(30),
+Telefone char(11),
+primary key(cpf)
+);
+
+CREATE TABLE Servico (
+Cod_ser int not null auto_increment,
+Descri varchar(60),
+constraint pk_srv primary key(cod_ser)
+);
+-- 
+alter table servico add column Valor decimal(10,2);
+--
+CREATE TABLE Funcionario (
+Cod_fun int not null PRIMARY KEY,
+Nome varchar(30) not null,
+Sequisso char(1),
+Dat_nas Date
+);
+-- 
+alter table funcionario change sequisso sexo char(1) not null;
+--
+CREATE TABLE trabalha (
+Cod_fun int,
+Seq_agenda int,
+PRIMARY KEY(Cod_fun,Seq_agenda),
+constraint fk_tr_fn FOREIGN KEY(Cod_fun) REFERENCES Funcionario (Cod_fun),
+FOREIGN KEY(Seq_agenda) REFERENCES Agendamento (Seq_agenda)
+) engine=InnoDB;
+--
+ALTER TABLE Agendamento ADD FOREIGN KEY(CPF) REFERENCES Cliente (CPF);
+ALTER TABLE Agendamento ADD FOREIGN KEY(Cod_ser) REFERENCES Servico (Cod_ser);
+--
+show tables;
+--
+desc servico;
+--
+insert into servico (Descri,Valor) values ('Corta cabelo',15.50);
+--
+select * from servico;
+--
+insert into servico (Descri,Valor) values ('Barba',15), ('Limpeza de pele',60);
+--
+update servico set valor = 21.50 where valor = 20.50;
+--
+desc agendamento;
+--
+insert into agendamento (data_hora, Cod_ser) values('2021-05-28',4);
+--
+insert into agendamento (data_hora, Cod_ser) values('2021-05-28',3);
+--
+delete from servico where cod_ser = 1;
+delete from servico where cod_ser = 3;
+--
+select * from servico;

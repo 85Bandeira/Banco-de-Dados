@@ -1,0 +1,272 @@
+SET autocommit=0;
+-- Exemplo de rollback
+--
+use bdweb34;
+select * from servico;
+--
+insert into servico (Descri,Valor) values ('Pintura de cabelo',45);
+commit;
+insert into servico (Descri,Valor) values ('Escova',35);
+--
+update servico set valor = 50 where valor = 45;
+rollback;
+
+SET autocommit=1;
+
+use northwind;
+--
+-- Comando Select 
+-- SELECT [DISTINCT] Colunas, Expressões,  [AS nome-atributo] {O que se quer exibir}
+-- [FROM Tabelas] { Onde estão as informações a serem exibidas}
+-- [WHERE condição]  {Filtros e Relacionamentos}
+-- [GROP BY Colunas] { Colunas que queremos grupar}
+-- [HAVING  BY Condição para as colunas grupadas]
+-- [ORDER BY attr_name1 [ASC / DESC ] { Ordem de exibição}
+--
+--
+select 78 * 56;
+-- Select mais simples
+--
+select * from funcionarios;
+--
+select pais from clientes;
+--
+select distinct pais from clientes; 
+--
+-- Operadores relacionais =; <; >; <>; Is null; Between..and; >=; <=; In; Like 
+--
+-- Liste os dados de todos os funcionários que moram nos EUA;
+Select *
+From funcionarios
+Where pais = 'EUA';
+--
+-- Liste os dados de todos os produtos cujo preço unitário seja superior a 50.00;
+Select *
+from produtos
+Where precounitario > 50;
+--
+-- Liste o número do pedido e a data do pedidos.;
+Select numerodopedido, datadopedido
+From pedidos;
+--
+-- Liste o nome do produto e preço unitário dos produtos cujo preço unitário seja 
+-- inferior a 30.00;
+Select nomedoproduto, precounitario
+from produtos
+Where precounitario < 30;
+--
+Select * from produtos where nomedoproduto like "C%";
+--
+Select * from produtos where nomedoproduto like "%w%";
+--
+-- Funções para manipulação de datas no MySql  
+-- Dia 	: DAY(Data); EXTRACT(DAY FROM CURDATE()) 
+-- Mês	: MONTH(Data); EXTRACT(MONTH FROM CURDATE()) 
+-- Ano	: YEAR(Data); EXTRACT(YEAR FROM CURDATE())
+-- Data Corrente : SYSDATE() ou curdate()
+-- Diferença entre duas datas é calculada em dias; 
+-- Para o MySQL existem funções especificas como: DATEDIFF, PERIOD_DIFF etc.
+--
+-- Liste todos os Pedidos que tenham sido feitos no mês de janeiro de 1997; 
+Select  * from pedidos 
+Where month(datadopedido)  =  01
+     and year(datadopedido) = 1997;
+-- 
+--    
+Select  * from pedidos 
+Where  EXTRACT(MONTH FROM datadopedido) =  01
+     and  EXTRACT(YEAR FROM datadopedido) = 1997;
+--
+-- Liste os pedidos entre os dias de 13/09/1997 e 31/10/1997
+Select  * from pedidos 
+Where datadopedido between '1997-09-13' and '1997-10-31';
+--
+-- Liste todos os pedidos efetuados durante o ano de 1998 e nos meses de Janeiro e outubro; 
+Select  numerodopedido, datadopedido from pedidos
+Where year(datadopedido) = 1997
+  and month(datadopedido) in (01,10);
+--
+select * from pedidos
+where datadeentrega is null;  
+--
+-- Select com mais de uma tabela
+--
+Select * from produtos;
+--
+select * from categorias;
+--
+select 77*8;
+--
+select * from produtos, categorias;
+--
+select * from produtos, categorias 
+where produtos.codigodacategoria =  categorias.codigodacategoria;
+--
+-- Liste o numero dos pedidos e nome dos funcionários que fizeram o pedido;
+--
+Select numerodopedido, nome
+From pedidos, funcionarios
+Where  pedidos.codigodofuncionario = funcionarios.codigodofuncionario; 
+--
+-- Liste todos pedidos realizados com o funcionário de nome “Nancy”;  
+--
+Select * 
+From pedidos p, funcionarios f
+Where p.codigodofuncionario = f.codigodofuncionario
+And nome = 'Nancy';
+--
+-- Liste o número do pedido e o nome da transportadora que fez a entrega;
+Select numerodopedido , nomedaempresa
+from pedidos p, transportadoras y
+where p.codigodatransportadora = y.codigodatransportadora;
+--
+desc fornecedores;
+-- Liste os fornecedores e as categorias que eles fornecem, porém, ordenados por Empresa;
+select * 
+from fornecedores f, produtos p, categorias r
+where f.codigodofornecedor = p.codigodofornecedor
+and p.codigodacategoria = r.codigodacategoria;
+--
+-- Liste os fornecedores e as categorias que eles fornecem, porém, ordenados por Empresa;
+select distinct nomedaempresa, nomedacategoria 
+from fornecedores f, produtos p, categorias r
+where f.codigodofornecedor = p.codigodofornecedor
+and p.codigodacategoria = r.codigodacategoria
+order by 1;
+--
+-- Inner Join
+-- Outer Join
+-- Left outer join
+-- Rigth outer join
+-- Cross Join
+-- Full Join
+-- Self Join
+--
+-- Pedidos que tem Clientes
+select * 
+from clientes c inner join pedidos p
+on c.codigodocliente = p.codigodocliente;
+--
+-- Clientes sem pedidos 
+select *
+from clientes c left outer join pedidos p
+ON c.codigodocliente = p.codigodocliente
+WHERE p.codigodocliente IS NULL;
+--
+--
+select * from pedidos;
+-- Pedidos sem clientes 
+SELECT * 
+FROM Clientes c RIGHT OUTER JOIN Pedidos p
+ON c.codigodocliente = p.codigodocliente
+WHERE c.codigodocliente is null;
+--
+--
+-- Liste os fornecedores e as categorias que eles fornecem, porém, ordenados por Empresa;
+select * 
+from fornecedores f inner join produtos p
+on  f.codigodofornecedor = p.codigodofornecedor
+inner join categorias r 
+on p.codigodacategoria = r.codigodacategoria;
+--
+--
+-- Funções agregadas - AVG, MAX, MIN, SUM e COUNT
+--
+-- Liste o maior preço, o menor preço e a média dos preços dos  produtos;
+--
+Select max(precounitario), 
+min(precounitario), 
+avg(precounitario)
+From produtos;
+
+-- Liste a quantidade de clientes com endereço em “Rio de Janeiro”;
+Select count(*) from clientes 
+Where cidade = 'Rio de Janeiro';
+
+-- Liste a quantidade de clientes na “Argentina”;
+Select count(*) from clientes 
+Where pais = 'Alemanha';
+--
+-- Liste a quantidade de pedidos no ano de 1996.
+Select count(*) from pedidos
+Where year(datadopedido) = 1996;
+--
+-- Criando grupos
+-- Liste a quantidade de pedidos que cada cliente fez no ano de 1996.
+Select count(*), nomedaempresa
+from pedidos p, clientes c
+Where p.codigodocliente = c.codigodocliente
+and year(datadopedido) = 1996
+Group by nomedaempresa;
+--
+-- Liste a quantidade de Clientes por país;
+Select pais, count(*)
+From clientes
+Group by pais; 
+
+-- Porém, as vezes é necessário realizar consultas que exigem o uso
+-- de uma condição usando funções agregadas. Para esses caso não 
+-- podemos usar o Where. Então lançamos mão do HAVING
+-- Liste o nome dos cientes que fizeram mais de 20 pedidos; 
+Select nomedaempresa, count(*)
+from clientes c, pedidos p
+where c.codigodocliente = p.codigodocliente
+group by nomedaempresa
+having count(*) > 20;
+
+-- Liste  em ordem alfabética os países da tabela
+--  clientes com a  quantidade de pedidos superior a 50;
+Select pais, count(*)
+from clientes c, pedidos p
+where c.codigodocliente = p.codigodocliente
+group by pais
+having count(*) > 50
+order by 2 desc;
+--
+-- Liste o nome dos fornecedores e o nome do clientes.
+Select nomedaempresa, "cliente"
+From clientes c
+Union 
+Select nomedaempresa, "fornecedores"
+From fornecedores
+order by 1;
+--
+-- Liste o nome da cidade 
+Select cidade from funcionarios
+ union
+Select cidade from clientes;
+--
+-- Liste o nome dos fornecedores que estejam em cidades que tenham clientes.
+Select distinct f.nomedaempresa
+From fornecedores f inner join clientes c On f.Cidade = c.cidade;
+--
+-- 
+select nomedaempresa 
+from fornecedores 
+where cidade in (select cidade from clientes);
+--
+-- Média de fretes por país; 
+Select avg(frete), paisdedestino
+From pedidos
+Group by paisdedestino;
+--
+Select sum(frete), count(*),(sum(frete)/count(*)), avg(frete), paisdedestino
+From pedidos
+Group by paisdedestino;
+--
+-- SELECT "nome_coluna1" FROM "nome_tabela1" 
+-- WHERE "nome_coluna2" [Comparison Operator] (SELECT "nome_coluna3" FROM "nome_tabela2" WHERE [condição])
+--
+-- Qual o número do pedido e o código do cliente  
+-- que tem valor de frete maior que o valor médio 
+-- do frete de 1998, organizado por código do cliente;
+select avg(frete)
+FROM pedidos
+wHERE year(datadopedido) = 1998;
+--
+SELECT numerodopedido, codigodocliente, frete
+FROM    pedidos
+WHERE frete   > (select avg(frete)
+				FROM pedidos
+				WHERE year(datadopedido) = 1998)
+Order by 2;
